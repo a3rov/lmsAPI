@@ -28,6 +28,12 @@ move_y = 0
 type_map = 0
 maps = ['map', 'sat', 'skl']
 
+with open('src/data.json', 'w', encoding='utf8') as obj:
+    json.dump({
+        "points": [
+        ]
+    }, obj, indent=2)
+
 
 def get_map(adress, create=False):
     try:
@@ -136,6 +142,15 @@ if __name__ == '__main__':
                     screen.fill((0, 0, 0))
                     screen.blit(image, (0, 0))
                     is_typing = False
+                    print(1)
+
+                if drawing.touch_delete(pygame.mouse.get_pos()):
+                    dell_last_point()
+                    image = get_map(url)
+                    screen.fill((0, 0, 0))
+                    screen.blit(image, (0, 0))
+                    is_typing = False
+                    print(2)
 
             if event.type == pygame.KEYDOWN:
                 key = event.key
@@ -149,9 +164,6 @@ if __name__ == '__main__':
                         url += event.unicode
 
                     continue
-
-                if key == pygame.K_MINUS:
-                    dell_last_point()
 
                 if key == pygame.K_PAGEUP:
                     if float(delta) < 32:
