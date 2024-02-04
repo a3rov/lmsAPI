@@ -1,3 +1,4 @@
+import json
 import os
 
 import pygame
@@ -6,7 +7,7 @@ import requests
 import drawing
 
 delta = '0.05'
-map_file = "data/map.png"
+map_file = "src/map.png"
 is_typing = False
 allow_symblos = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', 'z',
                  'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '0',
@@ -28,9 +29,9 @@ type_map = 0
 maps = ['map', 'sat', 'skl']
 
 
-def get_map(adress):
+def get_map(adress, create=False):
     try:
-        cords = get_cords(adress)
+        cords = get_cords(adress, create)
         response = get_picture(cords, delta)
 
         with open(map_file, "wb") as file:
@@ -49,10 +50,23 @@ def get_picture(centre, delta):
         "l": maps[type_map]
     }
 
+    with open('src/data.json', 'r', encoding='utf8') as obj:
+        result = json.load(obj)
+        print(result)
+
+    array = result['points']
+
+    src = []
+    print(array)
+    for obj in array:
+        src.append(f"{obj[0]},{obj[1]},pm2{obj[2]}l")
+
+    map_params['pt'] = '~'.join(src)
+
     return requests.get(map_api_server, params=map_params)
 
 
-def get_cords(toponym):
+def get_cords(toponym, create=False):
     geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
 
     geocoder_params = {
@@ -67,6 +81,9 @@ def get_cords(toponym):
     toponym_coodrinates = toponym["Point"]["pos"]
     toponym_longitude, toponym_lattitude = toponym_coodrinates.split()
 
+    if create:
+        create_point((toponym_longitude, toponym_lattitude))
+
     return ','.join([str(float(toponym_longitude) + move_x * float(delta) * 10),
                      str(float(toponym_lattitude) + move_y * float(delta) * 10)])
 
@@ -79,8 +96,16 @@ def change_map():
         type_map += 1
 
 
+def create_point(cords, color='rd'):
+    with open('src/data.json', 'r', encoding='utf8') as obj:
+        result = json.load(obj)
+        result['points'].append([cords[0], cords[1], color])
+        with open('src/data.json', 'w', encoding='utf8') as obj:
+            json.dump(result, obj, indent=2)
+
+
 if __name__ == '__main__':
-    get_map(url)
+    get_map(url, create=True)
 
     pygame.init()
     screen = pygame.display.set_mode((600, 450))
@@ -101,7 +126,7 @@ if __name__ == '__main__':
                         is_typing = True
 
                 if drawing.touch_find(pygame.mouse.get_pos()):
-                    image = get_map(url)
+                    image = get_map(url, create=True)
                     screen.fill((0, 0, 0))
                     screen.blit(image, (0, 0))
                     is_typing = False

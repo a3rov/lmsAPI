@@ -12,7 +12,7 @@ def draw_text_input(screen, text):
     text_rect = text_surface.get_rect(center=(50 + 400 / 2, 20 + 40 / 2))
 
     font2 = pygame.font.Font(None, 24)
-    text_surface2 = font2.render('Найти', True, (255, 255, 255))
+    text_surface2 = font2.render('Искать', True, (255, 255, 255))
     text_rect2 = text_surface2.get_rect(center=(475 + 100 / 2, 20 + 40 / 2))
     screen.blit(text_surface, text_rect)
     screen.blit(text_surface2, text_rect2)
