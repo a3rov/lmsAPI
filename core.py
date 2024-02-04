@@ -28,6 +28,7 @@ move_y = 0
 
 type_map = 0
 maps = ['map', 'sat', 'skl']
+get_index = False
 
 with open('src/data.json', 'w', encoding='utf8') as obj:
     json.dump({
@@ -87,11 +88,19 @@ def get_cords(toponym, create=False):
     toponym_coodrinates = toponym["Point"]["pos"]
     toponym_longitude, toponym_lattitude = toponym_coodrinates.split()
 
-    # with open('info.json', 'w', encoding='utf8') as obj:
-    #     json.dump(json_response, obj, indent=5, ensure_ascii=False)
+    with open('info.json', 'w', encoding='utf8') as obj:
+        json.dump(json_response, obj, indent=5, ensure_ascii=False)
 
     adress = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"][
         "GeocoderMetaData"]["Address"]["formatted"]
+
+    if get_index:
+        try:
+            adress += \
+            json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"][
+                "GeocoderMetaData"]["Address"]["postal_code"]
+        except:
+            pass
 
     if create:
         create_point((toponym_longitude, toponym_lattitude))
@@ -160,6 +169,13 @@ if __name__ == '__main__':
                     screen.blit(image, (0, 0))
                     is_typing = False
 
+                if drawing.touch_switch_index(pygame.mouse.get_pos()):
+                    if get_index:
+                        get_index = False
+                    else:
+                        get_index = True
+                    is_typing = False
+
             if event.type == pygame.KEYDOWN:
                 key = event.key
                 if is_typing:
@@ -200,7 +216,7 @@ if __name__ == '__main__':
                 screen.fill((0, 0, 0))
                 screen.blit(image, (0, 0))
 
-        drawing.draw_text_input(screen, url, adress)
+        drawing.draw_text_input(screen, url, adress, get_index)
         pygame.display.flip()
 
     pygame.quit()
