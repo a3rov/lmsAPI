@@ -21,6 +21,7 @@ allow_symblos = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'a', 's', 'd', 'f'
 clock = pygame.time.Clock()
 
 url = 'Казань'
+adress = 'Казань'
 
 move_x = 0
 move_y = 0
@@ -71,6 +72,7 @@ def get_picture(centre, delta):
 
 
 def get_cords(toponym, create=False):
+    global adress
     geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
 
     geocoder_params = {
@@ -84,6 +86,12 @@ def get_cords(toponym, create=False):
     toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
     toponym_coodrinates = toponym["Point"]["pos"]
     toponym_longitude, toponym_lattitude = toponym_coodrinates.split()
+
+    # with open('info.json', 'w', encoding='utf8') as obj:
+    #     json.dump(json_response, obj, indent=5, ensure_ascii=False)
+
+    adress = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"][
+        "GeocoderMetaData"]["Address"]["formatted"]
 
     if create:
         create_point((toponym_longitude, toponym_lattitude))
@@ -142,15 +150,15 @@ if __name__ == '__main__':
                     screen.fill((0, 0, 0))
                     screen.blit(image, (0, 0))
                     is_typing = False
-                    print(1)
 
                 if drawing.touch_delete(pygame.mouse.get_pos()):
                     dell_last_point()
+                    adress = 'Казань'
+                    url = 'Казань'
                     image = get_map(url)
                     screen.fill((0, 0, 0))
                     screen.blit(image, (0, 0))
                     is_typing = False
-                    print(2)
 
             if event.type == pygame.KEYDOWN:
                 key = event.key
@@ -192,7 +200,7 @@ if __name__ == '__main__':
                 screen.fill((0, 0, 0))
                 screen.blit(image, (0, 0))
 
-        drawing.draw_text_input(screen, url)
+        drawing.draw_text_input(screen, url, adress)
         pygame.display.flip()
 
     pygame.quit()
