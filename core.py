@@ -52,12 +52,10 @@ def get_picture(centre, delta):
 
     with open('src/data.json', 'r', encoding='utf8') as obj:
         result = json.load(obj)
-        print(result)
 
     array = result['points']
 
     src = []
-    print(array)
     for obj in array:
         src.append(f"{obj[0]},{obj[1]},pm2{obj[2]}l")
 
@@ -104,6 +102,14 @@ def create_point(cords, color='rd'):
             json.dump(result, obj, indent=2)
 
 
+def dell_last_point():
+    with open('src/data.json', 'r', encoding='utf8') as obj:
+        result = json.load(obj)
+        result['points'] = result['points'][:len(result['points']) - 1]
+        with open('src/data.json', 'w', encoding='utf8') as obj:
+            json.dump(result, obj, indent=2)
+
+
 if __name__ == '__main__':
     get_map(url, create=True)
 
@@ -143,6 +149,9 @@ if __name__ == '__main__':
                         url += event.unicode
 
                     continue
+
+                if key == pygame.K_MINUS:
+                    dell_last_point()
 
                 if key == pygame.K_PAGEUP:
                     if float(delta) < 32:
