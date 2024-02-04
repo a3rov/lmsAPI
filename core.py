@@ -174,6 +174,8 @@ if __name__ == '__main__':
                         get_index = False
                     else:
                         get_index = True
+
+                    image = get_map(url)
                     is_typing = False
 
             if event.type == pygame.KEYDOWN:
